@@ -10,8 +10,11 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 export class GraficaBarraComponent implements OnInit {
 
   @Input() horizontal: boolean = false;
-  @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
+  @Input() inputLabels!: any[] | unknown[] | undefined;
+  @Input() inputDatasets!: ChartDataset< any, any > [];
 
+  @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
+  
   public barChartOptions: ChartConfiguration['options'] = {
     responsive: true,
     // We use these empty structures as placeholders for dynamic theming.
@@ -29,12 +32,11 @@ export class GraficaBarraComponent implements OnInit {
         anchor: 'end',
         align: 'end'
       }
-    }
+    },
+    indexAxis: 'x',
   };
   public barChartType: ChartType = 'bar';
-  public barChartPlugins = [
-    ChartDataLabels
-  ];
+  public barChartPlugins = [ ChartDataLabels ];
 
   public barChartData: ChartData<'bar'> = {
     labels: [ '2006', '2007', '2008', '2009', '2010', '2011', '2012' ],
@@ -60,6 +62,16 @@ export class GraficaBarraComponent implements OnInit {
     ] as ChartDataset<'bar'>[]
   };
 
+  constructor() {}
+
+  ngOnInit(): void{
+    if ( this.horizontal ) {
+      this.barChartOptions!.indexAxis = 'y';
+      this.barChartData.datasets = this.inputDatasets;
+      this.barChartData.labels = this.inputLabels;
+    }
+  }
+
   // events
   public chartClicked({ event, active }: { event?: ChartEvent, active?: {}[] }): void {
     console.log(event, active);
@@ -69,13 +81,7 @@ export class GraficaBarraComponent implements OnInit {
     console.log(event, active);
   }
 
-  constructor() {}
-
-  ngOnInit(): void{
-    //if ( this.horizontal ) {
-    //  this.barChartType = true ;
-    //}
-  }
+  
 
   public randomize(): void {
     // Only Change 3 values
